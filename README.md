@@ -64,6 +64,25 @@ This application gathers the current and 5-day forecast weather data by using **
         - Displays the error message in the interface when an error is found.
     - Other functions such as **create_WRecord(), validate_date(), update_WRecord(), and delete_WRecord()** also checks for errors in their own fields. 
 
+## How to run the code
+
+1. Clone the repository on Github:
+   - git clone https://github.com/SuleKalkan/WeatherAppProject.git
+   - cd WeatherAppProject
+
+2. Install required items:
+   - pip install PyQt5 requests
+
+3. Inserting your own OpenWeatherMap API key:
+   - Open the file WeatherAppProject.py in VS Code
+   - Locate this line on my code:
+      - api_key = "4981db413db6be52cb48f5ea063549a6"
+   - replace the "4981db413db6be52cb48f5ea063549a6" with your own API key inside the quotations
+
+4. Run the application
+   - Click on the Run OR:
+   - Click on Terminal --> new Terminal and paste the following: python main.py
     
          
+
 
