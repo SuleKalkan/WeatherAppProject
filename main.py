@@ -9,6 +9,8 @@ from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtWidgets import QScrollArea
 from datetime import datetime, timedelta
 
+#This is the weatherApp class that takes in QWidget as a parameter.
+#It creates labels, a scroll area, and defines button functions for the interface.
 
 class WeatherApp(QWidget):
     def __init__(self):
@@ -67,6 +69,8 @@ class WeatherApp(QWidget):
 
         self.initialUI()
 
+
+    #This function builds the main UI of the app, it adds widgets/buttons to the interface, sets their alignments and styles such as font size and style.
     def initialUI(self):
         
 
@@ -162,6 +166,10 @@ class WeatherApp(QWidget):
         self.delete_button.clicked.connect(self.make_delete_record)
         self.info_button.clicked.connect(self.show_info)
 
+
+    #This function is called when the 'Get Weather' button is clicked. 
+    #It gathers weather data from the OpenWeatherMap API based on the city name or zip code the user entered.
+    #It handles HTTP errors and displays an error message if the request fails.
     def weather_result(self):
         api_key = "INSERT_YOUR_API_KEY"
         city = self.city_input.text().strip()
@@ -187,7 +195,7 @@ class WeatherApp(QWidget):
             if data["cod"] == 200 and data_forecast["cod"] == "200":
                 self.display_weather(data)
                 self.display_forecast(data_forecast)
-                
+        #These are the different HTTP errors that can be raised by the API request.
         except requests.exceptions.HTTPError as http_error:
             match res.status_code:
                 case 400:
@@ -218,7 +226,8 @@ class WeatherApp(QWidget):
         except requests.exceptions.RequestException as req_error:
             self.display_error(f"A Request error occurred: {req_error}")
        
-        
+    #This function manages the display of the 5-day weather forecast.
+    # it iterates through the weather data entries and extracts the Midday (12:00 PM) weather information for each day.
     def display_forecast(self, data):
         forecast_text = "<b> 5-day Forecast: </b><br>"
         shown_dates = set()
@@ -236,15 +245,20 @@ class WeatherApp(QWidget):
         self.forecast_label.setText(forecast_text)
         self.forecast_label.setStyleSheet("font-size: 18px;")
 
-
+    #This function is responsible for the display of error messages in the interface.
     def display_error(self, message):
         self.result_label.setStyleSheet("font-size: 25px;")
         self.result_label.setText(message)
 
+
+    #This function shows the current weather data in the interface.
+
     def display_weather(self, data):
         temperature_kel = data["main"]["temp"]
-        temperature_cel = temperature_kel - 273.15
+
+        # Convert Kelvin to Fahrenheit to display
         temperature_fah = (temperature_kel * 9/5) -459.67
+
         weather_id = data["weather"][0]["id"]
 
         weather_desc = data["weather"][0]["description"]
@@ -254,6 +268,8 @@ class WeatherApp(QWidget):
         self.desc_label.setText(weather_desc)
         self.desc_label.setStyleSheet("font-size: 25px;")
 
+
+    #This function determines the weather emoji based on the weather ID stated in the OpenWeatherMap API.
     @staticmethod
     def get_weather_icon(weather_id):
         if  200 <= weather_id <= 232:
@@ -279,7 +295,10 @@ class WeatherApp(QWidget):
         else:
             return " " 
         
-    def validate_date(self, start_date, end_date):
+
+
+    #This function sets the start and end dates for the weather records.
+    def val_date(self, start_date, end_date):
         try:
             start = datetime.strptime(start_date, "%Y-%m-%d")
             end = datetime.strptime(end_date, "%Y-%m-%d")
@@ -287,9 +306,13 @@ class WeatherApp(QWidget):
         except ValueError:
             return False
     
+    #This function validates the locartion the user entered.
     def val_location(self, location):
         return bool(location.strip())
     
+
+    #This function is responsible for creating a weather record.
+    #It checks if the location and the date range are valid, then creates a record.
     def create_wRecord(self, location, start_date, end_date, weather_data):
         if not self.val_location(location):
             return "Location is invalid."
@@ -304,20 +327,26 @@ class WeatherApp(QWidget):
         count = 0
         current_date = start_date
         while current_date <= end_date:
-            
+
+            #Here we check if the record is already in the database.
             self.cursor.execute("INSERT INTO weather_records (location, start_date, end_date, weather_data) VALUES (?, ?, ?, ?)",
                             (location, current_date.strftime("%Y-%m-%d"), current_date.strftime("%Y-%m-%d"), weather_data))
             count += 1
             current_date += timedelta(days=1)
+
+        #commits the date and time of the record, basically the current date and time.
         self.conn.commit()
         
         return f"Weather record created successfully for: {count} days"
     
+    #This function allows the user to read the weather record they created
     def read_wRecord(self):
         self.cursor.execute("SELECT location, start_date, end_date, weather_data FROM weather_records")
         rec = self.cursor.fetchall()
         return rec
     
+    #This function allows the user to update a weather record
+    # by changing the weather data for a specific date, location, and detail such as changing 'rainy' to 'sunny'.
     def update_wRecord(self, location, start_date, end_date, Nweather_data):
         self.cursor.execute(
             "UPDATE weather_records SET weather_data = ? WHERE location = ? AND start_date = ? AND end_date = ?",
@@ -330,6 +359,8 @@ class WeatherApp(QWidget):
         else:
             return "No records found to update or no changes made."
              
+
+    #This function lets the user delete a specific weather record.
     def delete_wRecord(self, location, start_date, end_date):
         self.cursor.execute(
             "DELETE FROM weather_records WHERE location = ? AND start_date = ? AND end_date = ?",
@@ -341,6 +372,11 @@ class WeatherApp(QWidget):
         else:
             return "No records found to delete."
         
+
+    #This function reads what the user entered for city name or zip code,
+    #gathers the start and end dates and weather data,
+    #and sends them to the create_WRecord function to store in the SQLite database.
+    #Then it confirms by displaying a message in the interface.
     def make_create_record(self):
         location = self.city_input.text().strip() or self.zip_input.text().strip()
         start_date = self.start_date_input.text().strip()
@@ -349,10 +385,15 @@ class WeatherApp(QWidget):
         result = self.create_wRecord(location, start_date, end_date, weather_data)
         self.result_label.setText(result)
 
+    #This function calls the read_wRecord function which retrieves the records from the weather_records
+    #it then converts the records into string format and displays them
     def make_read_record(self):
         records = self.read_wRecord()
         self.result_label.setText(str(records))
 
+    #This function reads the user input for the city name, zip code, start and end date and the Nweather(new weather) data.
+    #It then sends them to the update_wRecord function and updates the weather record
+    #It also displays a message in the interface
     def make_update_record(self):
         location = self.city_input.text().strip() or self.zip_input.text().strip()
         start_date = self.start_date_input.text().strip()
@@ -361,6 +402,11 @@ class WeatherApp(QWidget):
         result = self.update_wRecord(location, start_date, end_date, Nweather_data)
         self.result_label.setText(result)
 
+
+    #This function reads what the user entered for city name, zip code, start and end date.
+    #It then calls the delete_wRecord function and see if the information matches what's in the records.
+    #If it does match, it deletes the record
+    #It displays a message wherether the record was deleted or not.
     def make_delete_record(self):
         location = self.city_input.text().strip() or self.zip_input.text().strip()
         start_date = self.start_date_input.text().strip()
@@ -368,6 +414,7 @@ class WeatherApp(QWidget):
         result = self.delete_wRecord(location, start_date, end_date)
         self.result_label.setText(result)
 
+    #This function displays the Company information in a message box when the 'Info' button is clicked.
     def show_info(self):
         info_text = (
             
@@ -380,11 +427,14 @@ class WeatherApp(QWidget):
    
 
 
-
+#Thi code block is the main 'entry point' of the app
+#It manages the main interface and starts the application.
+##It creates an instance of the WeatherApp class
+#It checks for user input to see typing and clicking events.
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     weather_app = WeatherApp()
     weather_app.show()
-
     sys.exit(app.exec_())
+
 
