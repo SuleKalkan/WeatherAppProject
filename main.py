@@ -371,9 +371,9 @@ class WeatherApp(QWidget):
     def show_info(self):
         info_text = (
             
-            "The Product Manager Accelerator Program is designed to support PM professionals through every stage of their careers\n"\
-            "From students looking for entry-level jobs to Directors looking to take on a leadership role,\n"\
-            "our program has helped over hundreds of students fulfill their career aspirations.\n"
+            "PM Accelerator is a US based company with a global reach premiering in AI learning and as a development hub,\n"\
+            "featuring award-winning AI products and mentors from top-tier companies such as Google, Meta, Apple, and Nvidia.\n"\
+            "We offer a dynamic AI PM Bootcamp, designed to empower the next generation of AI professionals through hands-on experience, mentorship, and real-world projects.\n"
         )
         QMessageBox.information(self, "About PM Accelarator", info_text)
 
@@ -387,3 +387,4 @@ if __name__ == "__main__":
     weather_app.show()
 
     sys.exit(app.exec_())
+
