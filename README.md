@@ -76,13 +76,14 @@ This application gathers the current and 5-day forecast weather data by using **
 3. Inserting your own OpenWeatherMap API key:
    - Open the file WeatherAppProject.py in VS Code
    - Locate this line on my code:
-      - api_key = "4981db413db6be52cb48f5ea063549a6"
-   - replace the "4981db413db6be52cb48f5ea063549a6" with your own API key inside the quotations
+      - api_key = "INSERT_YOUR_API_KEY"
+   - replace the "INSERT_YOUR_API_KEY" with your own API key inside the quotations
 
 4. Run the application
    - Click on the Run OR:
    - Click on Terminal --> new Terminal and paste the following: python main.py
     
          
+
 
 
