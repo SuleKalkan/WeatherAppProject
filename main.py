@@ -163,7 +163,7 @@ class WeatherApp(QWidget):
         self.info_button.clicked.connect(self.show_info)
 
     def weather_result(self):
-        api_key = "4981db413db6be52cb48f5ea063549a6"
+        api_key = "INSERT_YOUR_API_KEY"
         city = self.city_input.text().strip()
         zip_code = self.zip_input.text().strip()
         if zip_code:
@@ -385,4 +385,5 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     weather_app = WeatherApp()
     weather_app.show()
+
     sys.exit(app.exec_())
